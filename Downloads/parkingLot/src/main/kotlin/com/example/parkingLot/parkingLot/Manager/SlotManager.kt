@@ -11,13 +11,14 @@ import com.example.parkingLot.parkingLot.exception.VehicleAlreadyParkedException
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.PARKING_SLOT
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.VEHICLE
 import com.example.parkingLot.parkingLot.model.parkingSlot
+import com.example.parkingLot.parkingLot.util.Loggable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @Component
-class SlotManager() {
+class SlotManager() : Loggable {
     @Autowired
     lateinit var parkingSlotDao : ParkingSlotDao
     @Autowired
@@ -25,16 +26,21 @@ class SlotManager() {
     private val lock = ReentrantLock()
 
      fun createSlots(count : Int,type : VehicleType): String = lock.withLock {
+         logger.info("initiating slot creation for type $type")
         val existingSlots = parkingSlotDao.getSlotsByType(type)
          val currentCount = existingSlots.size
         for(i in 1..count){
             parkingSlotDao.createSlot(currentCount+i,type)
         }
+         logger.info("created slots successfully for $type")
+
         return "Created $count slots for $type"
+
     }
 
 
      fun assignSlot(request: parkVehicleRequest): parkVehicleResponse = lock.withLock {
+         logger.info("initiating assigns slots for ${request.number}")
         if(vehicleDao.findByRegistrationNumber(request.number)!=null){
             throw VehicleAlreadyParkedException("Vehicle already parked.")
         }
@@ -42,6 +48,7 @@ class SlotManager() {
         throw SlotNotAvailableException("slot not available for ${request.type}")
          parkingSlotDao.markOccupied(freeSlot.id)
          vehicleDao.parkVehicle(request.number,request.type,freeSlot.id)
+         logger.info("successfully parked car in slot $freeSlot")
          return parkVehicleResponse(
              "Vehicle parked at slot ${freeSlot.slotNumber}",
              freeSlot.slotNumber
@@ -50,6 +57,7 @@ class SlotManager() {
 
 
      fun releaseSlot(slotNumber: Int): String = lock.withLock {
+         logger.info("initiating unparking for slotNumber $slotNumber")
          val slot = parkingSlotDao.getBySlotNumber(slotNumber)?:
         throw InvalidSlotException("parking lot is full")
         if(!slot.isOccupied)
@@ -57,6 +65,7 @@ class SlotManager() {
 
         vehicleDao.removeBySlotId(slot.id)
          parkingSlotDao.markFree(slot.id)
+         logger.info("Vehicle Unparked successfully from slot $slotNumber")
         return "Slot $slotNumber is now free"
     }
 
@@ -94,6 +103,7 @@ class SlotManager() {
     }
 
     fun removeSlotsComplete(type: VehicleType):String = lock.withLock {
+        logger.info("initiating slot deletion.")
         val slotsToRemove = parkingSlotDao.getSlotsByType(type)
         val occupiedSlots = slotsToRemove.filter{it.isOccupied}
 
@@ -107,16 +117,20 @@ class SlotManager() {
         }
         else {
             parkingSlotDao.deleteByType(type)
+            logger.info("slot deletion successfull.")
             return@withLock "Removed ${slotsToRemove.size} slots for $type"
         }
+
     }
     fun removePartialSlotsByType(type:VehicleType,count:Int):String = lock.withLock {
+        logger.info("initiating partial slot deletion.")
         val unOccupiedSlots = parkingSlotDao.getUnOccupiedBySlotsByType(type)
         if(unOccupiedSlots.size<count) {
             throw IllegalStateException("Only ${unOccupiedSlots.size} unoccupied slots available, but request to remove $count.")
         }
             val slotsToRemove = unOccupiedSlots.take(count)
             parkingSlotDao.deleteBySlotNumber(slotsToRemove)
+        logger.info("partial slot deletion successful.")
             return "Removed ${slotsToRemove.size} unoccupied slots for $type"
 
     }
