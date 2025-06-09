@@ -10,7 +10,6 @@ import com.example.parkingLot.parkingLot.exception.SlotNotAvailableException
 import com.example.parkingLot.parkingLot.exception.VehicleAlreadyParkedException
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.PARKING_SLOT
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.VEHICLE
-import com.example.parkingLot.parkingLot.jooq.public_.tables.records.ParkingSlotRecord
 import com.example.parkingLot.parkingLot.model.parkingSlot
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -110,6 +109,16 @@ class SlotManager() {
             parkingSlotDao.deleteByType(type)
             return@withLock "Removed ${slotsToRemove.size} slots for $type"
         }
+    }
+    fun removePartialSlotsByType(type:VehicleType,count:Int):String = lock.withLock {
+        val unOccupiedSlots = parkingSlotDao.getUnOccupiedBySlotsByType(type)
+        if(unOccupiedSlots.size<count) {
+            throw IllegalStateException("Only ${unOccupiedSlots.size} unoccupied slots available, but request to remove $count.")
+        }
+            val slotsToRemove = unOccupiedSlots.take(count)
+            parkingSlotDao.deleteBySlotNumber(slotsToRemove)
+            return "Removed ${slotsToRemove.size} unoccupied slots for $type"
+
     }
 
 }

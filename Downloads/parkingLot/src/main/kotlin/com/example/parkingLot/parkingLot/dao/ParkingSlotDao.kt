@@ -1,9 +1,11 @@
 package com.example.parkingLot.parkingLot.dao
 
 import VehicleType
+import com.example.parkingLot.parkingLot.jooq.public_.tables.ParkingSlot
 import com.example.parkingLot.parkingLot.jooq.public_.tables.records.ParkingSlotRecord
 import org.jooq.Record
 import org.jooq.Result
+import org.jooq.TableField
 
 interface ParkingSlotDao {
     fun createSlot(slotNumber : Int,vehicleType : VehicleType):Int
@@ -15,4 +17,6 @@ interface ParkingSlotDao {
     fun markFree(id:Int):Int
     fun deleteByType(type:VehicleType):Int
     fun getSlotsByType(type:VehicleType):List<ParkingSlotRecord>
+    fun getUnOccupiedBySlotsByType(type:VehicleType):List<Int>
+    fun deleteBySlotNumber(slotNumber: List<Int>)
 }

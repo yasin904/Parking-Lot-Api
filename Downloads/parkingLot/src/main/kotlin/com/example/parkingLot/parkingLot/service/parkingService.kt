@@ -16,4 +16,6 @@ interface parkingService {
     fun getFilteredSlots(type : VehicleType?,available : Boolean?): List<parkingSlotResponse>
 
     fun removeSlots(type: VehicleType):String
+
+    fun removePartialSlots(type:VehicleType,count:Int):String
 }

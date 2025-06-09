@@ -4,10 +4,12 @@ import VehicleType
 import com.example.parkingLot.parkingLot.dao.ParkingSlotDao
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.PARKING_SLOT
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.VEHICLE
+import com.example.parkingLot.parkingLot.jooq.public_.tables.ParkingSlot
 import com.example.parkingLot.parkingLot.jooq.public_.tables.records.ParkingSlotRecord
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
+import org.jooq.TableField
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 
@@ -78,6 +80,23 @@ class ParkingSlotDaoImpl(@Autowired private val dsl:DSLContext) : ParkingSlotDao
         return dsl.selectFrom(parking_slot)
             .where(parking_slot.VEHICLE_TYPE.eq(type.name))
             .fetch()
+    }
+
+    override fun getUnOccupiedBySlotsByType(type: VehicleType): List<Int> {
+        return dsl.select(parking_slot.SLOT_NUMBER)
+            .from(parking_slot)
+            .where(parking_slot.VEHICLE_TYPE.eq(type.name))
+            .and(parking_slot.IS_OCCUPIED.isFalse)
+            .fetch(parking_slot.SLOT_NUMBER)
+
+
+
+    }
+
+    override fun deleteBySlotNumber(slotNumber: List<Int>) {
+        dsl.deleteFrom(parking_slot)
+            .where(parking_slot.SLOT_NUMBER.`in`(slotNumber))
+            .execute()
     }
 
 }

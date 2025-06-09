@@ -42,5 +42,9 @@ class parkingController(
     fun removeAllSlots(@RequestParam type:VehicleType):ResponseEntity<String>{
         return ResponseEntity.ok(parkingService.removeSlots(type))
     }
+    @PostMapping("/partial-remove")
+    fun removeSlotByTypeAndCount(@RequestParam type:VehicleType,@RequestParam count : Int):ResponseEntity<String>{
+        return ResponseEntity.ok(parkingService.removePartialSlots(type,count))
+    }
 
 }

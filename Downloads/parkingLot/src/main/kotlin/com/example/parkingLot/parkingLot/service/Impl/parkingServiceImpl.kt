@@ -41,4 +41,8 @@ class parkingServiceImpl(
        return slotManager.removeSlotsComplete(type)
     }
 
+    override fun removePartialSlots(type: VehicleType, count: Int): String {
+        return slotManager.removePartialSlotsByType(type,count)
+    }
+
 }
