@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-
+@CrossOrigin(origins = ["http://localhost:5173"])
 @Validated
 @RestController
 @RequestMapping("/api/parking")
@@ -26,6 +26,12 @@ class parkingController(
     fun park(@RequestBody@Valid request: parkVehicleRequest):ResponseEntity<parkVehicleResponse>{
         val response = parkingService.parkVehicle(request)
         val status = if(response.slotNumber == -1) HttpStatus.BAD_REQUEST else HttpStatus.OK
+        val parkResponse = parkVehicleResponse(
+            message = response.message,
+            slotNumber = response.slotNumber,
+            vehicleType = response.vehicleType,
+            vehicleNumber = response.vehicleNumber
+        )
         return ResponseEntity(response,status)
     }
     @PostMapping("/unpark/{parkingSlot}")

@@ -29,11 +29,11 @@ class parkingServiceImpl(
     override fun getFilteredSlots(type: VehicleType?, available: Boolean?): List<parkingSlotResponse> {
         return slotManager.getAllSlots()
             .filter{(type == null || it.type == type) && (available == null || !it.isOccupied == available)}
-            .map { parkingSlotResponse(
-                slotNumber = it.slotNumber,
-                occupied = it.isOccupied,
-                vehicleType = it.vehicle?.vehicleType?.toString(),
-                VehicleNumber = it.vehicle?.vehicleNumber
+            .map { slot -> parkingSlotResponse(
+                slotNumber = slot.slotNumber,
+                occupied = slot.isOccupied,
+                vehicleType = slot.vehicle?.vehicleType?.toString(),
+                VehicleNumber = slot.vehicle?.vehicleNumber
             ) }
     }
 

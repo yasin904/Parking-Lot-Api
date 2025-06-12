@@ -3,12 +3,13 @@ package com.example.parkingLot.parkingLot.dao
 import VehicleType
 import com.example.parkingLot.parkingLot.jooq.public_.tables.ParkingSlot
 import com.example.parkingLot.parkingLot.jooq.public_.tables.records.ParkingSlotRecord
+import com.example.parkingLot.parkingLot.model.parkingSlot
 import org.jooq.Record
 import org.jooq.Result
 import org.jooq.TableField
 
 interface ParkingSlotDao {
-    fun createSlot(slotNumber : Int,vehicleType : VehicleType):Int
+    fun createSlot(count : Int,vehicleType : VehicleType):Int
     fun getAll():List<ParkingSlotRecord>
     fun getAllSlots(): Result<Record>
     fun getBySlotNumber(slotNumber: Int): ParkingSlotRecord?
@@ -19,4 +20,5 @@ interface ParkingSlotDao {
     fun getSlotsByType(type:VehicleType):List<ParkingSlotRecord>
     fun getUnOccupiedBySlotsByType(type:VehicleType):List<Int>
     fun deleteBySlotNumber(slotNumber: List<Int>)
+
 }

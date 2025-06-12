@@ -27,6 +27,7 @@ class SlotManager() : Loggable {
 
      fun createSlots(count : Int,type : VehicleType): String = lock.withLock {
          logger.info("initiating slot creation for type $type")
+
         val existingSlots = parkingSlotDao.getSlotsByType(type)
          val currentCount = existingSlots.size
         for(i in 1..count){
@@ -51,7 +52,10 @@ class SlotManager() : Loggable {
          logger.info("successfully parked car in slot $freeSlot")
          return parkVehicleResponse(
              "Vehicle parked at slot ${freeSlot.slotNumber}",
-             freeSlot.slotNumber
+             slotNumber = freeSlot.slotNumber,
+             vehicleType = request.type,
+             vehicleNumber = request.number
+
          )
     }
 
@@ -59,7 +63,7 @@ class SlotManager() : Loggable {
      fun releaseSlot(slotNumber: Int): String = lock.withLock {
          logger.info("initiating unparking for slotNumber $slotNumber")
          val slot = parkingSlotDao.getBySlotNumber(slotNumber)?:
-        throw InvalidSlotException("parking lot is full")
+        throw InvalidSlotException("No vehicle parked in Slot.")
         if(!slot.isOccupied)
             throw SlotNotAvailableException("Slot is already empty")
 
