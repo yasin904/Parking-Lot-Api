@@ -5,11 +5,14 @@ import com.example.parkingLot.parkingLot.dto.parkingSlotResponse
 import com.example.parkingLot.parkingLot.service.parkingService
 import org.intellij.lang.annotations.Pattern
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+@CrossOrigin(origins = ["http://localhost:5173"])
 @Validated
+
 @RestController
 @RequestMapping("api/parking")
 class SlotController(private val parkingService: parkingService) {

@@ -6,6 +6,9 @@ import com.example.parkingLot.parkingLot.jooq.public_.Tables.PARKING_SLOT
 import com.example.parkingLot.parkingLot.jooq.public_.Tables.VEHICLE
 import com.example.parkingLot.parkingLot.jooq.public_.tables.ParkingSlot
 import com.example.parkingLot.parkingLot.jooq.public_.tables.records.ParkingSlotRecord
+import com.example.parkingLot.parkingLot.mapper.Mapper
+import com.example.parkingLot.parkingLot.model.parkingSlot
+import com.example.parkingLot.parkingLot.mapper.Mapper.toDomain
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
@@ -17,9 +20,8 @@ import org.springframework.stereotype.Repository
 class ParkingSlotDaoImpl(@Autowired private val dsl:DSLContext) : ParkingSlotDao {
     private val parking_slot = PARKING_SLOT
     private val vehicle = VEHICLE
-    override fun createSlot(slotNumber: Int, vehicleType: VehicleType): Int {
+    override fun createSlot(count: Int, vehicleType: VehicleType): Int {
        return dsl.insertInto(parking_slot)
-                .set(parking_slot.SLOT_NUMBER, slotNumber)
                 .set(parking_slot.VEHICLE_TYPE, vehicleType.name)
                 .set(parking_slot.IS_OCCUPIED, false)
                 .execute()
@@ -98,5 +100,7 @@ class ParkingSlotDaoImpl(@Autowired private val dsl:DSLContext) : ParkingSlotDao
             .where(parking_slot.SLOT_NUMBER.`in`(slotNumber))
             .execute()
     }
+
+
 
 }
