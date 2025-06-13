@@ -34,7 +34,7 @@ class ParkingSlotDaoImpl(@Autowired private val dsl:DSLContext) : ParkingSlotDao
     override fun getAllSlots(): Result<Record> {
         return dsl.select()
             .from(parking_slot)
-            .leftJoin(vehicle).on(parking_slot.SLOT_NUMBER.eq(vehicle.PARKING_SLOT_ID))
+            .leftJoin(vehicle).on(parking_slot.ID.eq(vehicle.PARKING_SLOT_ID))
             .orderBy(parking_slot.SLOT_NUMBER)
             .fetch()
 
